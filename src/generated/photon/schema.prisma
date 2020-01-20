@@ -1,0 +1,47 @@
+datasource db {
+    provider = "sqlite"
+    url      = "file:dev.db"
+    enabled  = false
+}
+
+datasource postgres {
+    provider = "postgres"
+    url      = env("POSTGRES_URL")
+    // url      = "postgresql://vignesh:pwd0123456789@localhost:1992/channelwhatsapp"
+    default  = true
+}
+
+generator photon {
+    provider = "photonjs"
+    output   = "../../../generated/photon"
+}
+
+model TimecampusAuth {
+    id    String @default(cuid()) @id
+    scope String
+}
+
+model ChannelAuth {
+    id            String           @default(cuid()) @id
+    userID        String           @unique
+    channelID     String           @unique
+    whatsappno    String?
+    status        String
+    providerData  String?
+    providerToken String?
+    userConfig    String?
+    scopes        TimecampusAuth[]
+    createdDate   DateTime         @default(now())
+    updatedDate   DateTime         @updatedAt
+}
+
+model AuditLogs {
+    id          String   @default(cuid()) @id
+    userID      String   @unique
+    whatsappno  String
+    message     String
+    direction   String
+    metadata    String?
+    createdDate DateTime @default(now())
+    updatedDate DateTime @updatedAt
+}

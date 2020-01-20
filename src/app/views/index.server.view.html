@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>{{head.title}}</title>
+
+        <script
+            src="https://statics.teams.microsoft.com/sdk/v1.5.2/js/MicrosoftTeams.min.js"
+            integrity="sha384-TJ2M0tW5fxu25/LwZie10M5O53iP1Q5FweiXk5rvfTHmvA7x2a6I9+KKi2pjAk6k"
+            crossorigin="anonymous"
+        ></script>
+
+        <script type="text/javascript">
+            // OAUTH2 FOR EVERY PROVIDER
+
+            microsoftTeams.initialize();
+
+            const getCookie = function(cookieString, cname) {
+                var name = cname + '=';
+                var decodedCookie = decodeURIComponent(cookieString);
+                var ca = decodedCookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
+                }
+                return '';
+            };
+
+            var tcAuthStr = getCookie(window.document.cookie, 'tcAuthToken');
+            var authMessage;
+
+            if (tcAuthStr) {
+                var tcAuthObj = JSON.parse(tcAuthStr);
+
+                authMessage = {
+                    event: 'auth-complete',
+                    tcAuthToken: tcAuthObj.token,
+                    username: tcAuthObj.username,
+                    userID: tcAuthObj.userID
+                };
+
+                if (window.opener) {
+                    window.opener.postMessage(authMessage, '*');
+                    microsoftTeams.authentication.notifySuccess({
+                        data: authMessage
+                    });
+                } else {
+                    microsoftTeams.authentication.notifySuccess({
+                        data: authMessage
+                    });
+                }
+            }
+            // microsoftTeams.authentication.notifyFailure('StateDoesNotMatch');
+        </script>
+    </head>
+
+    <body>
+        <h2>{{content.title}}</h2>
+        {{content.description}}
+    </body>
+</html>

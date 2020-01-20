@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>{{head.title}}</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <style type="text/css">
+            * {
+                box-sizing: border-box;
+            }
+
+            .row::after {
+                content: '';
+                clear: both;
+                display: table;
+            }
+
+            [class*='col-'] {
+                float: left;
+                padding: 15px;
+            }
+
+            html {
+                font-family: 'Lucida Sans', sans-serif;
+            }
+
+            .header {
+                background-color: #1b672e;
+                color: #ffffff;
+                padding: 15px;
+            }
+
+            .menu ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .menu li {
+                padding: 8px;
+                margin-bottom: 7px;
+                background-color: #33b5e5;
+                color: #ffffff;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
+                    0 1px 2px rgba(0, 0, 0, 0.24);
+            }
+
+            .menu li:hover {
+                background-color: #0099cc;
+            }
+
+            .aside {
+                background-color: #1b672e;
+                padding: 15px;
+                color: #ffffff;
+                text-align: left;
+                font-size: 14px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
+                    0 1px 2px rgba(0, 0, 0, 0.24);
+            }
+
+            .aside a {
+                color: white;
+            }
+
+            .footer {
+                /* background-color: #0099cc; */
+                color: black;
+                text-align: center;
+                font-size: 12px;
+                padding: 15px;
+            }
+
+            /* For mobile phones: */
+            [class*='col-'] {
+                width: 100%;
+            }
+
+            @media only screen and (min-width: 600px) {
+                /* For tablets: */
+                .col-s-1 {
+                    width: 8.33%;
+                }
+                .col-s-2 {
+                    width: 16.66%;
+                }
+                .col-s-3 {
+                    width: 25%;
+                }
+                .col-s-4 {
+                    width: 33.33%;
+                }
+                .col-s-5 {
+                    width: 41.66%;
+                }
+                .col-s-6 {
+                    width: 50%;
+                }
+                .col-s-7 {
+                    width: 58.33%;
+                }
+                .col-s-8 {
+                    width: 66.66%;
+                }
+                .col-s-9 {
+                    width: 75%;
+                }
+                .col-s-10 {
+                    width: 83.33%;
+                }
+                .col-s-11 {
+                    width: 91.66%;
+                }
+                .col-s-12 {
+                    width: 100%;
+                }
+            }
+            @media only screen and (min-width: 768px) {
+                /* For desktop: */
+                .col-1 {
+                    width: 8.33%;
+                }
+                .col-2 {
+                    width: 16.66%;
+                }
+                .col-3 {
+                    width: 25%;
+                }
+                .col-4 {
+                    width: 33.33%;
+                }
+                .col-5 {
+                    width: 41.66%;
+                }
+                .col-6 {
+                    width: 50%;
+                }
+                .col-7 {
+                    width: 58.33%;
+                }
+                .col-8 {
+                    width: 66.66%;
+                }
+                .col-9 {
+                    width: 75%;
+                }
+                .col-10 {
+                    width: 83.33%;
+                }
+                .col-11 {
+                    width: 91.66%;
+                }
+                .col-12 {
+                    width: 100%;
+                }
+            }
+
+            #otpForm {
+                display: none;
+            }
+
+            input[type='text'] {
+                width: 300px;
+                padding: 5px;
+                border-radius: 5px;
+                margin: 2px;
+            }
+        </style>
+
+        <script
+            src="https://statics.teams.microsoft.com/sdk/v1.5.2/js/MicrosoftTeams.min.js"
+            integrity="sha384-TJ2M0tW5fxu25/LwZie10M5O53iP1Q5FweiXk5rvfTHmvA7x2a6I9+KKi2pjAk6k"
+            crossorigin="anonymous"
+        ></script>
+
+        <script type="text/javascript">
+            // OAUTH2 FOR EVERY PROVIDER
+
+            microsoftTeams.initialize();
+
+            const getCookie = function(cookieString, cname) {
+                var name = cname + '=';
+                var decodedCookie = decodeURIComponent(cookieString);
+                var ca = decodedCookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
+                }
+                return '';
+            };
+
+            var tcAuthStr = getCookie(window.document.cookie, 'tcAuthToken');
+            var authMessage;
+
+            if (tcAuthStr) {
+                var tcAuthObj = JSON.parse(tcAuthStr);
+
+                authMessage = {
+                    event: 'auth-complete',
+                    tcAuthToken: tcAuthObj.token,
+                    username: tcAuthObj.username,
+                    userID: tcAuthObj.userID
+                };
+
+                if (window.opener) {
+                    window.opener.postMessage(authMessage, '*');
+                    microsoftTeams.authentication.notifySuccess({
+                        data: authMessage
+                    });
+                } else {
+                    microsoftTeams.authentication.notifySuccess({
+                        data: authMessage
+                    });
+                }
+            }
+            // microsoftTeams.authentication.notifyFailure('StateDoesNotMatch');
+        </script>
+
+        <script type="text/javascript">
+            function handleWhatsapp() {
+                fetch('/whatsapp/configure', {
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json'
+                    },
+                    // TODO: See security implication here
+                    body: JSON.stringify({
+                        whatsappno: document.querySelector('#whatsappno').value,
+                        userID: document.querySelector('#userID').value
+                    })
+                })
+                    .then(response => response.json())
+                    .then(function(data) {
+                        console.log(
+                            'Request succeeded with JSON response',
+                            data
+                        );
+
+                        alert(
+                            'We have sent you an OTP to your whatsapp number. Please enter it to proceed.'
+                        );
+
+                        document.querySelector(
+                            '#userID1'
+                        ).value = document.querySelector('#userID').value;
+                        document.querySelector(
+                            '#whatsappno1'
+                        ).value = document.querySelector('#whatsappno').value;
+                        document.querySelector('#configForm').style.display =
+                            'none';
+                        document.querySelector('#otpForm').style.display =
+                            'block';
+                    })
+                    .catch(function(error) {
+                        console.log('Request failed', error);
+                    });
+            }
+
+            function handleOTP() {
+                fetch('/whatsapp/verify/otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json'
+                    },
+                    // TODO: See security implication here
+                    body: JSON.stringify({
+                        whatsappno: document.querySelector('#whatsappno1')
+                            .value,
+                        userID: document.querySelector('#userID1').value,
+                        otp: document.querySelector('#otp').value
+                    })
+                })
+                    .then(response => {
+                        if (response.status !== 200) {
+                            alert(
+                                'OOPS! Verification unsuccessful! Please try again!'
+                            );
+                            return false;
+                        }
+
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        console.log('JSON response', data);
+
+                        if (data) {
+                            alert(
+                                'Verification Successful! You can go ahead and start using Timecampus via Whatsapp now. You can start by saying Hi and our bot will help you to get started from there. Cheers!'
+                            );
+
+                            var channelMessage = {
+                                event: 'workflow-complete'
+                            };
+
+                            window.opener.postMessage(channelMessage, '*');
+                            microsoftTeams.authentication.notifySuccess({
+                                data: channelMessage
+                            });
+                        } else {
+                            alert(
+                                'Verification Unsuccessful! Looks like some error occured! Please Try again or kindly contact support if it persists. Thanks.'
+                            );
+                        }
+                    })
+                    .catch(function(error) {
+                        console.log('Request failed', error);
+                        alert(
+                            'OOPS! Verification unsuccessful! Please try again!'
+                        );
+                    });
+            }
+        </script>
+    </head>
+
+    <body>
+        <div class="header">
+            <h1>{{content.title}}</h1>
+        </div>
+
+        <br /><br />
+
+        <!-- {{content.description}} -->
+
+        <div class="row">
+            <div class="col-3 col-s-3 menu"></div>
+
+            <div class="col-6 col-s-9">
+                <form id="configForm">
+                    <h2>Your Whatsapp Number</h2>
+                    <input
+                        type="text"
+                        placeholder="Whatsapp Number (format: +919876543210)"
+                        id="whatsappno"
+                        name="whatsappno"
+                    />
+
+                    <input
+                        type="hidden"
+                        id="userID"
+                        name="userID"
+                        value="{{content.userID}}"
+                    />
+
+                    <br /><br />
+
+                    <input
+                        type="button"
+                        onclick="handleWhatsapp();"
+                        value="Proceed"
+                    />
+                </form>
+
+                <form id="otpForm">
+                    <h2>Your OTP</h2>
+                    <input type="hidden" id="whatsappno1" name="whatsappno1" />
+
+                    <input
+                        type="text"
+                        placeholder="Your OTP here"
+                        id="otp"
+                        name="otp"
+                    />
+
+                    <input
+                        type="hidden"
+                        id="userID1"
+                        name="userID1"
+                        value="{{content.userID}}"
+                    />
+
+                    <br /><br />
+
+                    <input
+                        type="button"
+                        onclick="handleOTP();"
+                        value="Verify OTP"
+                    />
+                    <input
+                        type="button"
+                        onclick="handleWhatsapp();"
+                        value="Resend OTP"
+                    />
+                </form>
+            </div>
+
+            <div class="col-3 col-s-12">
+                <div class="aside">
+                    <h2>NOTE:</h2>
+                    <p>
+                        Please prefix your country code as well as you provide
+                        in whatsapp. eg. +919876543210
+                    </p>
+
+                    <h2>Didn't receive OTP still?</h2>
+                    <p>
+                        Please
+                        <a href="mailto:support@timecampus.com">Contact Us</a>
+                    </p>
+
+                    <h2>What next after verification?</h2>
+                    <p>
+                        Just say "Hi" in Whatsapp and the bot will help you out
+                        on everything :-)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Copyright - 2020 - Timecampus Technologies Pvt. Ltd.</p>
+        </div>
+    </body>
+</html>
