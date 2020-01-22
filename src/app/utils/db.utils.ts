@@ -4,17 +4,24 @@
 
 import { Photon } from '../../generated/photon';
 
+let photon;
+
 class Store {
     store: Object;
 
     context: Object;
 
     constructor() {
-        this.store = new Photon({
-            datasources: {
-                postgres: process.env.POSTGRES_URL
-            }
-        });
+        if (photon) {
+            this.store = photon;
+        } else {
+            this.store = new Photon({
+                datasources: {
+                    postgres: process.env.POSTGRES_URL
+                }
+            });
+            photon = this.store;
+        }
     }
 
     initialize(config) {
@@ -22,7 +29,10 @@ class Store {
     }
 
     getStore() {
-        return new Photon({
+        if (photon) {
+            return photon;
+        }
+        photon = new Photon({
             datasources: {
                 postgres: process.env.POSTGRES_URL
             },
@@ -33,7 +43,15 @@ class Store {
                 }
             ]
         });
+        return photon;
     }
 }
+
+process.once('SIGUSR2', async () => {
+    if (photon) {
+        await photon.disconnect();
+    }
+    process.kill(process.pid, 'SIGUSR2');
+});
 
 export { Store };
