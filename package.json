@@ -25,7 +25,7 @@
     "private": true,
     "dependencies": {
         "@prisma/photon": "^2.0.0-preview019",
-        "axios": "^0.19.0",
+        "axios": "^0.21.1",
         "body-parser": "^1.19.0",
         "cookie-parser": "^1.4.4",
         "cross-env": "^6.0.3",
